@@ -23,6 +23,9 @@ import MessageContext from '../context/MessageContext';
 import LoadingContext from '../context/LoadingContext';
 import UserContext from '../context/UserContext';
 
+// TODO quando aperto para enviar, deve tirar keyboard
+// TODO keyboard arrastar para cima a tela e não ficar por cima
+
 const RedefineScreen = ({ navigation }) => {
   const firstAccess = navigation.getParam('firstAccess');
   const requestToken = navigation.getParam('requestToken');

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import {
   backgroundColor,
@@ -17,10 +17,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { StackActions, NavigationActions } from 'react-navigation';
 
 const ConfigScreen = ({ navigation }) => {
-  const lastSync = global.lastSync || 'Não realizado';
   // Context
   // const user = { _id: 'teste' };
-
+  const [lastSync, setLastSync] = useState('Não realizado');
   const { setSync, logOff } = useContext(CardContext);
   const handleLoading = useContext(LoadingContext);
   const { data: user } = useContext(UserContext);
@@ -30,17 +29,38 @@ const ConfigScreen = ({ navigation }) => {
     actions: [NavigationActions.navigate({ routeName: 'Login' })]
   });
 
-  const handleLogOff = async () => {
+  useEffect(() => {
+    if (global.lastSync) {
+      setLastSync(
+        global.lastSync
+          .toISOString()
+          .split('T')[1]
+          .split('.')[0]
+      );
+    }
+  }, [global.lastSync]);
+
+  const handleSync = async type => {
     handleLoading(true, 'Carregando...');
-    // Parando o intervalo de sincronia
-    setSync(user._id, 'stop');
     // Fazendo ultima sincronia
     setSync(user._id, 'now');
-    // Removendo usuário do armazenamento local
-    await AsyncStorage.removeItem('userToken');
     handleLoading(false, '');
-    navigation.dispatch(logoutAction);
-    logOff();
+    global.lastSync = new Date();
+    setLastSync(
+      new Date()
+        .toISOString()
+        .split('T')[1]
+        .split('.')[0]
+    );
+    if (type === 'logoff') {
+      // Parando o intervalo de sincronia
+      setSync(user._id, 'stop');
+      // Removendo usuário do armazenamento local
+      await AsyncStorage.removeItem('userToken');
+      // Voltando para tela de Login
+      navigation.dispatch(logoutAction);
+      logOff();
+    }
   };
 
   return (
@@ -55,16 +75,16 @@ const ConfigScreen = ({ navigation }) => {
         </View>
         <Button
           text="Sincronizar agora"
-          callBack={() => handleLogOff()}
+          callBack={() => handleSync()}
           style={styles.buttonSync}
         />
         <Text
           style={styles.textSync}
-        >{`Ultima sincronização em: ${lastSync}`}</Text>
+        >{`Ultima sincronização as: ${lastSync}`}</Text>
       </View>
       <Button
         text="Log-off"
-        callBack={() => handleLogOff()}
+        callBack={() => handleSync('logoff')}
         style={styles.buttonLogoff}
       />
     </View>

@@ -75,7 +75,10 @@ const LoginScreen = ({ navigation }) => {
       ) {
         handleLoading(false, '');
         // navigation.dispatch(homeScreenDefault);
-        const paramToPass = { firstAccess: true };
+        const paramToPass = {
+          firstAccess:
+            response.data.message === 'Primeiro acesso' ? true : false
+        };
         if (response.data.message === 'Primeiro acesso' && rememberCheckValue)
           return navigation.navigate('Redefine', {
             ...paramToPass,
@@ -101,6 +104,7 @@ const LoginScreen = ({ navigation }) => {
       }
     } catch (err) {
       handleLoading(false, '');
+      console.log(err);
       handleWarning(true, err.response.data.message);
     }
   };

@@ -78,6 +78,7 @@ const listReducer = (state, action) => {
 
     case 'sync':
       server.delete(`/card/${action.userId}`).then(() => {
+        console.log('deletado cards');
         if (state.length > 0) {
           for (const data of state) {
             server
@@ -85,6 +86,7 @@ const listReducer = (state, action) => {
               .then(() => console.log('adicionado', data));
           }
         }
+        global.lastSync = new Date();
       });
       return state;
 

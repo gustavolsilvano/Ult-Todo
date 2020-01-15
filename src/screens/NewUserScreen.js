@@ -38,7 +38,7 @@ const newUserScreen = ({ navigation }) => {
   const [emailFocus, setEmailFocus] = useState(false);
 
   const [photo, setPhoto] = useState(profilePlaceHolder);
-
+  // TODO mensagem sem lenght ta dando falha no mensagem flutuante
   const [isTextShow, setIsTextShow] = useState(true);
 
   // Defining functions
