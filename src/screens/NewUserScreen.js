@@ -1,11 +1,15 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+  SafeAreaView
 } from 'react-native';
 import FillField from '../components/FillField';
 import Button from '../components/Button';
@@ -44,10 +48,11 @@ const newUserScreen = ({ navigation }) => {
   const [imageToUpload, setImageToUpload] = useState(null);
   const [isTextShow, setIsTextShow] = useState(true);
 
+  const [isEnabled, setIsEnabled] = useState(true);
+
   // Defining functions
 
   // TODO x para exlucir foto
-  //TODO se estiver digitando e apertar para procurar imagem, o layout não volta para baixo, keyboard fica como se estivesse ainda
   // Submitting account
   const submitAccount = async () => {
     handleLoading(true, 'Carregando...');
@@ -77,65 +82,76 @@ const newUserScreen = ({ navigation }) => {
     setEmailFocus(false);
   };
 
-  const showKeyboard = () => {
+  const keyboardDidShow = () => {
     setIsTextShow(false);
   };
 
-  const hideKeayboard = () => {
+  const ketboardDidHide = () => {
     setIsTextShow(true);
   };
 
-  useKeyboardShow(showKeyboard, hideKeayboard);
+  useKeyboardShow(keyboardDidShow, ketboardDidHide);
 
   return (
-    <>
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-        <View style={styles.containerTitle}>
-          {isTextShow ? (
-            <Text style={styles.title}>
-              Crie sua nova conta e faça parte do Ultimate ToDo App!
-            </Text>
-          ) : null}
-        </View>
-        <TouchableOpacity
-          style={styles.containerPhoto}
-          onPress={() => selectImage(setPhoto, setImageToUpload)}
-        >
-          <Image
-            source={photo ? { uri: photo } : profilePlaceHolder}
-            style={styles.photo}
-          />
-        </TouchableOpacity>
-        <View style={styles.containerFields}>
-          <FillField
-            field="NOME"
-            onChangeTextInput={value => setName(value)}
-            focus={nameFocus}
-            setNext={() => {
-              handleResetNextFocus();
-              if (!email) setEmailFocus(true);
-              if (email && name) submitAccount();
-            }}
-            resetNextFocus={handleResetNextFocus}
-          />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      enabled={isEnabled}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <View style={styles.containerTitle}>
+              {isTextShow ? (
+                <Text style={styles.title}>
+                  Crie sua nova conta e faça parte do Ultimate ToDo App!
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.containerPhoto}>
+              <TouchableOpacity
+                onPress={() => selectImage(setPhoto, setImageToUpload)}
+              >
+                <Image
+                  source={photo ? { uri: photo } : profilePlaceHolder}
+                  style={styles.photo}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.containerFields}>
+              <FillField
+                field="NOME"
+                type="fullname"
+                onChangeTextInput={value => setName(value)}
+                focus={nameFocus}
+                setNext={() => {
+                  handleResetNextFocus();
+                  if (!email) setEmailFocus(true);
+                  if (email && name) submitAccount();
+                }}
+                resetNextFocus={handleResetNextFocus}
+              />
 
-          <FillField
-            marginTop={20}
-            field="EMAIL"
-            onChangeTextInput={value => setEmail(value)}
-            focus={emailFocus}
-            setNext={() => {
-              handleResetNextFocus();
-              if (!name) setNameFocus(true);
-              if (email && name) submitAccount();
-            }}
-            resetNextFocus={handleResetNextFocus}
-          />
+              <FillField
+                marginTop={20}
+                field="EMAIL"
+                type="email"
+                onChangeTextInput={value => setEmail(value)}
+                focus={emailFocus}
+                setNext={() => {
+                  handleResetNextFocus();
+                  if (!name) setNameFocus(true);
+                  if (email && name) submitAccount();
+                }}
+                resetNextFocus={handleResetNextFocus}
+              />
 
-          <Button text="CADASTRAR" callBack={() => submitAccount()} />
-        </View>
-      </KeyboardAvoidingView>
-    </>
+              <Button text="CADASTRAR" callBack={() => submitAccount()} />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -145,8 +161,7 @@ newUserScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
     backgroundColor
   },
   containerTitle: {

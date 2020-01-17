@@ -84,7 +84,6 @@ const LoginScreen = ({ navigation }) => {
       const profilePhoto = await getProfilePhoto(
         `${imageURL}/${response.data.data.user.photo}`
       );
-      console.log({ profilePhoto });
 
       defineUser({
         ...response.data.data.user,
@@ -132,7 +131,6 @@ const LoginScreen = ({ navigation }) => {
     }
   };
   //TODO se não tiver conexão, entrar offline e quando voltar a internet, sincronizar
-  //TODO editar dados do usuário
   // TODO usuário inativo, quando tentar voltar, enviar email de confirmação para alterar senha.
   const handleResetNextFocus = () => {
     setPasswordFocus(false);
@@ -175,6 +173,7 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.containerFields}>
         <FillField
           field="EMAIL"
+          type="email"
           onChangeTextInput={val => setEmail(val)}
           setNext={() => {
             if (!password) setPasswordFocus(true);
@@ -185,9 +184,9 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <FillField
-          secure={true}
           marginTop={10}
           field="SENHA"
+          type="password"
           onChangeTextInput={val => setPassword(val)}
           setNext={() => {
             if (!email) setEmailFocus(true);

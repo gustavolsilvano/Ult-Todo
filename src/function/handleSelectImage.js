@@ -24,6 +24,7 @@ export default (setPhoto, setImageToUpload) => {
         response.uri = await cropSelectedImage(response.uri);
         if (setImageToUpload) setImageToUpload(response);
         setPhoto(response.uri);
+        return;
       }
     }
   );

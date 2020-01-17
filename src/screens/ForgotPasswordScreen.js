@@ -4,7 +4,8 @@ import {
   View,
   Image,
   StyleSheet,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback
 } from 'react-native';
 import server from '../api/server';
 import {
@@ -43,29 +44,34 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
   return (
     <KeyboardAvoidingView style={styles.container}>
-      <View style={styles.containerLogo}>
-        <Image source={logo} style={styles.logo} />
-        <Text style={styles.textTitle}>Esqueceu sua senha?</Text>
-        <Text style={styles.text}>
-          Um email com senha provisória será enviado para você. Preencha o campo
-          abaixo com seu email.
-        </Text>
-      </View>
-      <View style={styles.containerEmail}>
-        <FillField
-          field="EMAIL"
-          onChangeTextInput={value => setEmail(value)}
-          setNext={() => handleSubmitForgot()}
-        />
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View style={styles.containerLogo}>
+            <Image source={logo} style={styles.logo} />
+            <Text style={styles.textTitle}>Esqueceu sua senha?</Text>
+            <Text style={styles.text}>
+              Um email com senha provisória será enviado para você. Preencha o
+              campo abaixo com seu email.
+            </Text>
+          </View>
+          <View style={styles.containerEmail}>
+            <FillField
+              field="EMAIL"
+              type="email"
+              onChangeTextInput={value => setEmail(value)}
+              setNext={() => handleSubmitForgot()}
+            />
 
-        <Button text="ENVIAR" callBack={() => handleSubmitForgot()} />
-        <View style={styles.textButton}>
-          <TextButton
-            text="Login"
-            callBack={() => navigation.navigate('Login')}
-          />
+            <Button text="ENVIAR" callBack={() => handleSubmitForgot()} />
+            <View style={styles.textButton}>
+              <TextButton
+                text="Login"
+                callBack={() => navigation.navigate('Login')}
+              />
+            </View>
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };

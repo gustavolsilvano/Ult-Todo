@@ -61,7 +61,6 @@ const ConfigScreen = ({ navigation }) => {
       logOff();
     }
   };
-  // TODO editar dados do perfil
 
   return (
     <View style={styles.container}>

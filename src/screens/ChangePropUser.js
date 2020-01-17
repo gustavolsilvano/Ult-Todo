@@ -102,6 +102,7 @@ const newUserScreen = ({ navigation }) => {
         <View style={styles.containerFields}>
           <FillField
             field="NOME"
+            type="fullname"
             initialValue={name}
             onChangeTextInput={value => setName(value)}
             focus={nameFocus}
@@ -117,6 +118,7 @@ const newUserScreen = ({ navigation }) => {
             marginTop={20}
             initialValue={email}
             field="EMAIL"
+            type="email"
             onChangeTextInput={value => setEmail(value)}
             focus={emailFocus}
             setNext={() => {

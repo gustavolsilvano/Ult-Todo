@@ -98,8 +98,8 @@ const RedefineScreen = ({ navigation }) => {
       </View>
       <View style={styles.containerEmail}>
         <FillField
-          secure={true}
           field="SENHA"
+          type="password"
           onChangeTextInput={value => setPassword(value)}
           focus={passwordFocus}
           setNext={() => {
@@ -112,6 +112,7 @@ const RedefineScreen = ({ navigation }) => {
           marginTop={10}
           secure={true}
           field="CONFIRMAR SENHA"
+          type="password"
           onChangeTextInput={value => setConfirmPassword(value)}
           focus={confirmPasswordFocus}
           setNext={() => {

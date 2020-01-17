@@ -1,18 +1,32 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { textColor } from '../constants/constants';
 
 const FillField = ({
   field,
   marginTop,
-  secure,
+  type,
   onChangeTextInput,
   focus,
   setNext,
   resetNextFocus,
   initialValue
 }) => {
+  // Configurando configuração inicial
+  const initialConfig = () => {
+    defaultConfig = {
+      capitalize: 'sentences',
+      secure: false
+    };
+
+    if (type === 'email') return { ...defaultConfig, capitalize: 'none' };
+    if (type === 'password')
+      return { ...defaultConfig, secure: true, capitalize: 'none' };
+    if (type === 'fullname') return { ...defaultConfig, capitalize: 'words' };
+  };
+
   const [inputValue, setInputValue] = useState(initialValue);
+  const [config, setConfig] = useState(initialConfig());
 
   const inputRef = useRef();
 
@@ -34,12 +48,13 @@ const FillField = ({
     <View style={[styles.container, { marginTop }]}>
       <Text style={styles.text}>{field}</Text>
       <TextInput
+        autoCapitalize={config.capitalize}
         ref={inputRef}
         value={inputValue}
         blurOnSubmit={false}
         onChangeText={text => inputHandle(text)}
         onSubmitEditing={handleSubmit}
-        secureTextEntry={secure}
+        secureTextEntry={config.secure}
         style={styles.textInput}
       />
     </View>
