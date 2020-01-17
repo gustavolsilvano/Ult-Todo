@@ -69,13 +69,6 @@ const RedefineScreen = ({ navigation }) => {
         user
       });
 
-      // Definindo usuário no context
-      defineUser({
-        ...response.data.data.user,
-        token: response.data.token,
-        photo: `${imageURL}/${response.data.data.user.photo}`
-      });
-
       // Mostrando mensagem de retorno
       handleWarning(true, response, 'response');
 

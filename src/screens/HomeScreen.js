@@ -18,8 +18,6 @@ const HomeScreen = ({ navigation }) => {
   const guest = { name: 'visitante', _id: 'visitante' };
   const user = data || guest;
 
-  console.log('user', user);
-
   // CONTEXT
   const {
     state: listContext,
@@ -28,7 +26,6 @@ const HomeScreen = ({ navigation }) => {
     loadingCard,
     setSync
   } = useContext(CardContext);
-  console.log('state', listContext);
 
   const handleLoading = useContext(LoadingContext);
   // TODO indicar caso não tenha internet

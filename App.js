@@ -11,6 +11,7 @@ import ConfigScreen from './src/screens/ConfigScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import RedefineScreen from './src/screens/RedefineScreen';
+import ChangePropUser from './src/screens/ChangePropUser';
 
 import { CardProvider } from './src/context/CardContext';
 import { UserProvider } from './src/context/UserContext';
@@ -28,7 +29,8 @@ const AppNavigator = createStackNavigator(
     Conf: ConfigScreen,
     Welcome: WelcomeScreen,
     Forgot: ForgotPasswordScreen,
-    Redefine: RedefineScreen
+    Redefine: RedefineScreen,
+    Change: ChangePropUser
   },
   {
     initialRouteName: 'Login',

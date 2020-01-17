@@ -20,8 +20,6 @@ const StartScreen = ({ navigation }) => {
     circle3: 'white'
   });
 
-  console.log({ x });
-
   const handleEndScroll = () => {
     if (x < width / 2) {
       setCircleBGC({ circle1: 'black', circle2: 'white', circle3: 'white' });

@@ -9,9 +9,10 @@ const FillField = ({
   onChangeTextInput,
   focus,
   setNext,
-  resetNextFocus
+  resetNextFocus,
+  initialValue
 }) => {
-  const [inputValue, setInputValue] = useState(null);
+  const [inputValue, setInputValue] = useState(initialValue);
 
   const inputRef = useRef();
 

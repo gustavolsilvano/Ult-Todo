@@ -9,22 +9,19 @@ import {
 } from 'react-native';
 import FillField from '../components/FillField';
 import Button from '../components/Button';
-
-import server from '../api/server';
-import {
-  width,
-  backgroundColor,
-  textColor,
-  profilePlaceHolder
-} from '../constants/constants';
-
-import useKeyboardShow from '../hooks/useKeyboardShow';
+import TextButton from '../components/TextButton';
 
 import selectImage from '../function/handleSelectImage';
 import createForm from '../function/createForm';
 
+import server from '../api/server';
+import { width, backgroundColor, textColor } from '../constants/constants';
+
+import useKeyboardShow from '../hooks/useKeyboardShow';
+
 import LoadingContext from '../context/LoadingContext';
 import MessageContext from '../context/MessageContext';
+import UserContext from '../context/UserContext';
 
 // Defining global variables
 
@@ -32,41 +29,42 @@ const newUserScreen = ({ navigation }) => {
   // Context
   const handleLoading = useContext(LoadingContext);
   const handleWarning = useContext(MessageContext);
+  const { data: user, defineUser } = useContext(UserContext);
 
   // Defining states
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
 
   const [nameFocus, setNameFocus] = useState(false);
   const [emailFocus, setEmailFocus] = useState(false);
 
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = useState(user.photo);
   const [imageToUpload, setImageToUpload] = useState(null);
   const [isTextShow, setIsTextShow] = useState(true);
 
   // Defining functions
+  // TODO ajustar para so atualizer nome e email, sem precisar mexer na photo
 
-  // TODO x para exlucir foto
-  //TODO se estiver digitando e apertar para procurar imagem, o layout não volta para baixo, keyboard fica como se estivesse ainda
   // Submitting account
-  const submitAccount = async () => {
+  const updateAccount = async () => {
     handleLoading(true, 'Carregando...');
     try {
-      const data = createForm(imageToUpload, name, email);
+      const data = createForm(imageToUpload, name, email, user);
       const response = await server({
         method: 'post',
-        url: '/users/signUp',
+        url: '/users/updateMe',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'multipart/form-data'
         },
         data: data
       });
+      defineUser({ ...user, name, email, photo });
       handleLoading(false, '');
       handleWarning(true, response, 'response');
-      navigation.navigate('Login');
+      navigation.navigate('Conf');
     } catch (err) {
-      console.log('Erro ao criar conta', err);
+      console.log('Erro ao atualizar conta', err);
       handleLoading(false, '');
       handleWarning(true, err, 'error');
     }
@@ -92,47 +90,49 @@ const newUserScreen = ({ navigation }) => {
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
         <View style={styles.containerTitle}>
           {isTextShow ? (
-            <Text style={styles.title}>
-              Crie sua nova conta e faça parte do Ultimate ToDo App!
-            </Text>
+            <Text style={styles.title}>Atualize seus dados abaixo.</Text>
           ) : null}
         </View>
         <TouchableOpacity
           style={styles.containerPhoto}
           onPress={() => selectImage(setPhoto, setImageToUpload)}
         >
-          <Image
-            source={photo ? { uri: photo } : profilePlaceHolder}
-            style={styles.photo}
-          />
+          <Image source={{ uri: photo }} style={styles.photo} />
         </TouchableOpacity>
         <View style={styles.containerFields}>
           <FillField
             field="NOME"
+            initialValue={name}
             onChangeTextInput={value => setName(value)}
             focus={nameFocus}
             setNext={() => {
               handleResetNextFocus();
               if (!email) setEmailFocus(true);
-              if (email && name) submitAccount();
+              if (email && name) updateAccount();
             }}
             resetNextFocus={handleResetNextFocus}
           />
 
           <FillField
             marginTop={20}
+            initialValue={email}
             field="EMAIL"
             onChangeTextInput={value => setEmail(value)}
             focus={emailFocus}
             setNext={() => {
               handleResetNextFocus();
               if (!name) setNameFocus(true);
-              if (email && name) submitAccount();
+              if (email && name) updateAccount();
             }}
             resetNextFocus={handleResetNextFocus}
           />
 
-          <Button text="CADASTRAR" callBack={() => submitAccount()} />
+          <Button text="ATUALIZAR" callBack={() => updateAccount()} />
+          <TextButton
+            style={{ marginTop: 10 }}
+            text="Voltar"
+            callBack={() => navigation.pop()}
+          />
         </View>
       </KeyboardAvoidingView>
     </>

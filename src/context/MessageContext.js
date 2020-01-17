@@ -16,8 +16,7 @@ export const MessageProvider = ({ children }) => {
   };
   // TODO escolher cor de fundo
   const checkResponse = res => {
-    console.log('response', res);
-    return response.data.message;
+    return res.data.message;
   };
 
   const handleWarning = (isShow, msg, type) => {

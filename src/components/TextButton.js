@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { textColor } from '../constants/constants';
 
-const TextButton = ({ text, callBack }) => {
+const TextButton = ({ text, callBack, style }) => {
   return (
     <TouchableOpacity onPress={() => callBack()}>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={[styles.text, style]}>{text}</Text>
     </TouchableOpacity>
   );
 };

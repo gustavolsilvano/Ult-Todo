@@ -57,6 +57,20 @@ const LoginScreen = ({ navigation }) => {
     actions: [NavigationActions.navigate({ routeName: 'Login' })]
   });
 
+  const getProfilePhoto = async url => {
+    try {
+      const profile = await server.get(url);
+      return profile.config.url;
+    } catch (err) {
+      console.log('erro carregando foto', err);
+      handleWarning(
+        true,
+        'Algo deu errado. Tente novamente mais tarde.',
+        'error'
+      );
+    }
+  };
+
   const handleLogin = async token => {
     handleLoading(true, 'Carregando...');
 
@@ -67,10 +81,15 @@ const LoginScreen = ({ navigation }) => {
         token
       });
 
+      const profilePhoto = await getProfilePhoto(
+        `${imageURL}/${response.data.data.user.photo}`
+      );
+      console.log({ profilePhoto });
+
       defineUser({
         ...response.data.data.user,
         token: response.data.token,
-        photo: `${imageURL}/${response.data.data.user.photo}`
+        photo: profilePhoto
       });
 
       // Redefinindo senha
@@ -93,12 +112,10 @@ const LoginScreen = ({ navigation }) => {
       } else {
         // Seguindo para login normal
         if (!rememberCheckValue && !token) {
-          console.log('removendo');
           await AsyncStorage.removeItem('userToken');
         }
 
         if (rememberCheckValue || token) {
-          console.log('salvando token', response.data.token);
           await AsyncStorage.setItem(
             'userToken',
             JSON.stringify(response.data.token)

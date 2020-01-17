@@ -22,7 +22,6 @@ const loadingCardsHandle = async (loadingCard, userId, callback) => {
   } else {
     returnList = localList || dbList;
   }
-  console.log({ returnList });
   loadingCard(returnList, userId);
   callback();
 };

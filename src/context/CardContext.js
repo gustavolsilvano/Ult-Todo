@@ -6,6 +6,7 @@ import sortCards from '../function/sortCards';
 import dateHandler from '../function/dateHandler';
 import server from '../api/server';
 import { delay } from '../constants/constants';
+import BackgroundTimer from 'react-native-background-timer';
 
 const listReducer = (state, action) => {
   let newList = [];
@@ -152,7 +153,10 @@ const setSync = dispatch => {
     switch (event) {
       case 'start':
         if (!idTime)
-          idTime = setInterval(() => dispatch({ type: 'sync', userId }), delay);
+          idTime = BackgroundTimer.setInterval(
+            () => dispatch({ type: 'sync', userId }),
+            delay
+          );
         break;
 
       case 'stop':
