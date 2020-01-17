@@ -16,7 +16,8 @@ import {
   logo,
   logoStye,
   backgroundColor,
-  textColor
+  textColor,
+  imageURL
 } from '../constants/constants';
 
 import Button from '../components/Button';
@@ -66,7 +67,11 @@ const LoginScreen = ({ navigation }) => {
         token
       });
 
-      defineUser({ ...response.data.data.user, token: response.data.token });
+      defineUser({
+        ...response.data.data.user,
+        token: response.data.token,
+        photo: `${imageURL}/${response.data.data.user.photo}`
+      });
 
       // Redefinindo senha
       if (
@@ -105,10 +110,10 @@ const LoginScreen = ({ navigation }) => {
     } catch (err) {
       handleLoading(false, '');
       console.log(err);
-      handleWarning(true, err.response.data.message);
+      await AsyncStorage.removeItem('userToken');
+      handleWarning(true, err, 'error');
     }
   };
-  //TODO enviar email para email real e não para mailtrap
   //TODO se não tiver conexão, entrar offline e quando voltar a internet, sincronizar
   //TODO editar dados do usuário
   // TODO usuário inativo, quando tentar voltar, enviar email de confirmação para alterar senha.
@@ -136,10 +141,8 @@ const LoginScreen = ({ navigation }) => {
 
   const retrieveRememberUser = async () => {
     try {
-      console.log('aqui');
       const userPreParse = await AsyncStorage.getItem('userToken');
       const userToken = JSON.parse(userPreParse);
-      console.log('aqui', userToken);
       if (!userToken) return;
       handleLogin(userToken);
     } catch (err) {

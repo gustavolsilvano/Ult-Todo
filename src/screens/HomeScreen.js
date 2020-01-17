@@ -18,7 +18,8 @@ const HomeScreen = ({ navigation }) => {
   const guest = { name: 'visitante', _id: 'visitante' };
   const user = data || guest;
 
-  console.log('ID', user._id);
+  console.log('user', user);
+
   // CONTEXT
   const {
     state: listContext,

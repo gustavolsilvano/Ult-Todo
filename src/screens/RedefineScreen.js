@@ -11,7 +11,8 @@ import {
   logo,
   logoStye,
   backgroundColor,
-  textColor
+  textColor,
+  imageURL
 } from '../constants/constants';
 import Button from '../components/Button';
 import TextButton from '../components/TextButton';
@@ -59,7 +60,7 @@ const RedefineScreen = ({ navigation }) => {
     handleLoading(true, 'Carregando...');
     if (password !== confirmPassword) {
       handleLoading(false, '');
-      return handleWarning(true, 'As senhas devem ser iguais');
+      return handleWarning(true, 'As senhas devem ser iguais', 'error');
     }
     try {
       const response = await server.patch('/users/redefinePassword', {
@@ -71,11 +72,12 @@ const RedefineScreen = ({ navigation }) => {
       // Definindo usuário no context
       defineUser({
         ...response.data.data.user,
-        token: response.data.token
+        token: response.data.token,
+        photo: `${imageURL}/${response.data.data.user.photo}`
       });
 
       // Mostrando mensagem de retorno
-      handleWarning(true, response.data.message);
+      handleWarning(true, response, 'response');
 
       handleLoading(false, '');
 
@@ -88,8 +90,7 @@ const RedefineScreen = ({ navigation }) => {
       navigation.dispatch(mainScreenDefault);
     } catch (err) {
       handleLoading(false, '');
-      handleWarning(true, err.response.data.message);
-      console.log('ERRO', err);
+      handleWarning(true, err, 'error');
     }
   };
 

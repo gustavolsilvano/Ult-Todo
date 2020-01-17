@@ -1,12 +1,68 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import { backgroundColor, logo, logoStye } from '../constants/constants';
+import React, { useRef, useState, useEffect } from 'react';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  Animated,
+  ScrollView
+} from 'react-native';
+import { backgroundColor, logo, logoStye, width } from '../constants/constants';
 import { StackActions, NavigationActions } from 'react-navigation';
 import Button from '../components/Button';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { width } from '../constants/constants';
 
 const StartScreen = ({ navigation }) => {
+  const scrollRef = useRef(null);
+  const [x, setX] = useState(null);
+  const [circleBGC, setCircleBGC] = useState({
+    circle1: 'black',
+    circle2: 'white',
+    circle3: 'white'
+  });
+
+  console.log({ x });
+
+  const handleEndScroll = () => {
+    if (x < width / 2) {
+      setCircleBGC({ circle1: 'black', circle2: 'white', circle3: 'white' });
+      scrollRef.current.scrollTo({ x: 0, y: 0, animated: true });
+    } else if (x >= width / 2 && x < width + width / 2) {
+      setCircleBGC({ circle1: 'white', circle2: 'black', circle3: 'white' });
+      scrollRef.current.scrollTo({ x: width, y: 0, animated: true });
+    } else if (x >= width + width / 2 && x < 2 * width) {
+      setCircleBGC({ circle1: 'white', circle2: 'white', circle3: 'black' });
+      scrollRef.current.scrollTo({
+        x: 2 * width,
+        y: 0,
+        animated: true
+      });
+    }
+  };
+
+  const firstScreen = () => {
+    return (
+      <View style={styles.view}>
+        <Text style={styles.text}>Primeira tela</Text>
+      </View>
+    );
+  };
+
+  const secondScreen = () => {
+    return (
+      <View style={styles.view}>
+        <Text style={styles.text}>Segunda tela</Text>
+      </View>
+    );
+  };
+
+  const thirdScreen = () => {
+    return (
+      <View style={styles.view}>
+        <Text style={styles.text}>Terceira tela</Text>
+      </View>
+    );
+  };
+
   const homeScreenDefault = StackActions.reset({
     index: 0,
     actions: [NavigationActions.navigate({ routeName: 'Home' })]
@@ -16,49 +72,27 @@ const StartScreen = ({ navigation }) => {
     navigation.dispatch(homeScreenDefault);
   };
 
-  const thirdScreen = () => {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.textTitle}>Terceira tela 😍😍!</Text>
-      </View>
-    );
-  };
-
-  const secondScreen = () => {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.textTitle}>
-          Nesse app você poderá determinar quais são seus objetivos de curto,
-          médio e longo prazo 😍😍!
-        </Text>
-      </View>
-    );
-  };
-
-  const firstScreen = () => {
-    return (
-      <View style={styles.containerLogo}>
-        <Image style={styles.logo} source={logo} />
-
-        <Text style={styles.textTitle}>BEM VINDO AO ULTIMATE ToDo APP</Text>
-      </View>
-    );
-  };
-
-  // TODO concluir swipable cards
-  const secondCard = () => {
-    return secondScreen();
-  };
-
   return (
     <View style={styles.container}>
-      <Swipeable renderRightActions={secondCard}>
-        <View style={styles.containerLogo}>
-          <Image style={styles.logo} source={logo} />
-
-          <Text style={styles.textTitle}>BEM VINDO AO ULTIMATE ToDo APP</Text>
-        </View>
-      </Swipeable>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scroll}
+        horizontal={true}
+        onScroll={event => {
+          setX(event.nativeEvent.contentOffset.x);
+        }}
+        onScrollEndDrag={handleEndScroll}
+        showsHorizontalScrollIndicator={false}
+      >
+        {firstScreen()}
+        {secondScreen()}
+        {thirdScreen()}
+      </ScrollView>
+      <View style={styles.containerCircle}>
+        <View style={[styles.circle, { backgroundColor: circleBGC.circle1 }]} />
+        <View style={[styles.circle, { backgroundColor: circleBGC.circle2 }]} />
+        <View style={[styles.circle, { backgroundColor: circleBGC.circle3 }]} />
+      </View>
       <Button
         text="Vamos Começar!"
         callBack={handleGoHome}
@@ -77,26 +111,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    zIndex: 1
   },
-  containerLogo: {
-    flex: 1,
+  containerCircle: {
     justifyContent: 'center',
     alignItems: 'center',
-    width
-  },
-  textTitle: {
-    fontSize: 20,
-    color: 'white',
-    marginTop: 20,
-    marginHorizontal: 20
-  },
-  logo: {
-    width: logoStye.width,
-    height: logoStye.height
+    width,
+    flexDirection: 'row'
   },
   button: {
     marginBottom: 100
+  },
+  scroll: {
+    flex: 1
+  },
+  view: {
+    flex: 1,
+    width,
+    backgroundColor,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  circle: {
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: 'red',
+    marginHorizontal: 10
+  },
+  text: {
+    fontSize: 20
   }
 });
 

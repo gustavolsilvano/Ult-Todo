@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import FillField from '../components/FillField';
 import Button from '../components/Button';
+import ImagePicker from 'react-native-image-picker';
+import ImageEditor from '@react-native-community/image-editor';
 
 import server from '../api/server';
 import {
@@ -37,11 +39,67 @@ const newUserScreen = ({ navigation }) => {
   const [nameFocus, setNameFocus] = useState(false);
   const [emailFocus, setEmailFocus] = useState(false);
 
-  const [photo, setPhoto] = useState(profilePlaceHolder);
-  // TODO mensagem sem lenght ta dando falha no mensagem flutuante
+  const [photo, setPhoto] = useState(null);
+  const [imageToUpload, setImageToUpload] = useState(null);
   const [isTextShow, setIsTextShow] = useState(true);
 
   // Defining functions
+
+  // Upload image
+  const uploadImage = async (photo, user) => {
+    const data = new FormData();
+    data.append('userId', user._id);
+    data.append('fileData', {
+      uri: photo.uri,
+      type: photo.type,
+      name: photo.fileName
+    });
+    const config = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data'
+      },
+      body: data
+    };
+    // TODO usar axios, tem que ver como define headers e body corretamente
+    await fetch('http://10.0.2.2:3000/users/uploadImage', config);
+  };
+
+  // Crop image
+
+  const cropSelectedImage = async uri => {
+    const cropData = {
+      offset: { x: 0, y: 0 },
+      size: { width: 1500, height: 1500 }
+    };
+    return await ImageEditor.cropImage(uri, cropData);
+  };
+
+  // Image picker
+  const selectImage = async () => {
+    ImagePicker.showImagePicker(
+      { noData: true, mediaType: 'photo' },
+      async response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          handleWarning(
+            true,
+            'Algo de errado. Escolha um arquivo de foto.',
+            'error'
+          );
+          console.log('ImagePicker Error: ', response.error);
+        } else {
+          response.uri = await cropSelectedImage(response.uri);
+          setImageToUpload(response);
+          setPhoto(response.uri);
+        }
+      }
+    );
+  };
+  //TODO se estiver digitando e apertar para procurar imagem, o layout não volta para baixo, keyboard fica como se estivesse ainda
+  // Submitting account
   const submitAccount = async () => {
     handleLoading(true, 'Carregando...');
     try {
@@ -49,12 +107,17 @@ const newUserScreen = ({ navigation }) => {
         name,
         email
       });
+      const user = response.data.data.user;
+      if (imageToUpload) {
+        uploadImage(imageToUpload, user);
+      }
       handleLoading(false, '');
-      handleWarning(true, response.data.message);
+      handleWarning(true, response, 'response');
       navigation.navigate('Login');
     } catch (err) {
+      console.log('Erro ao criar conta', err);
       handleLoading(false, '');
-      handleWarning(true, err.response.data.message);
+      handleWarning(true, err, 'error');
     }
   };
 
@@ -73,31 +136,6 @@ const newUserScreen = ({ navigation }) => {
 
   useKeyboardShow(showKeyboard, hideKeayboard);
 
-  // TODO pegar imagem do dispositivo
-
-  // Image Picker
-  // const getPhoto = () => {
-  //   const options = {
-  //     storageOptions: {
-  //       skipBackup: true,
-  //       path: 'images'
-  //     }
-  //   };
-
-  //   ImagePicker.showImagePicker(options, response => {
-  //     console.log('Response = ', response);
-
-  //     if (response.didCancel) {
-  //       console.log('User cancelled image picker');
-  //     } else if (response.error) {
-  //       console.log('ImagePicker Error: ', response.error);
-  //     } else {
-  //       const source = { uri: response.uri };
-  //       setPhoto(source);
-  //     }
-  //   });
-  // };
-
   return (
     <>
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
@@ -110,9 +148,12 @@ const newUserScreen = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.containerPhoto}
-          onPress={() => getPhoto()}
+          onPress={() => selectImage()}
         >
-          <Image source={photo} style={styles.photo} />
+          <Image
+            source={photo ? { uri: photo } : profilePlaceHolder}
+            style={styles.photo}
+          />
         </TouchableOpacity>
         <View style={styles.containerFields}>
           <FillField
@@ -194,9 +235,10 @@ const styles = StyleSheet.create({
   },
   photo: {
     marginTop: 10,
-    resizeMode: 'contain',
     width: width * 0.5,
-    height: width * 0.5
+    height: width * 0.5,
+    borderWidth: 1,
+    borderRadius: width
   }
 });
 

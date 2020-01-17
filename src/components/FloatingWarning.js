@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, StyleSheet } from 'react-native';
 
-const FloatinWarning = ({ show, text, effectEnded }) => {
+const FloatingWarning = ({ show, text, effectEnded }) => {
   const delayTextLength = () => {
     let delay = 2000;
-    if (text.length > 100) delay = 5000;
+    if (text && text.length > 100) delay = 5000;
     return delay;
   };
   const delay = delayTextLength();
@@ -57,4 +57,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default FloatinWarning;
+export default FloatingWarning;

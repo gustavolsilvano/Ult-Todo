@@ -28,16 +28,17 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const handleSubmitForgot = async () => {
     handleLoading(true, 'Carregando...');
+
     try {
       const response = await server.post('/users/forgotPassword', {
         email
       });
       handleLoading(false, '');
-      handleWarning(true, response.data.message);
+      handleWarning(true, response, 'response');
       navigation.navigate('Login');
     } catch (err) {
       handleLoading(false, '');
-      handleWarning(true, err.response.data.message);
+      handleWarning(true, err, 'error');
     }
   };
   return (

@@ -31,10 +31,17 @@ const cardColorConf = '#f4511e';
 
 const textColor = 'white';
 
-const profilePlaceHolder = require('../../resource/profilePlaceholder.png');
+const profilePlaceHolder = require('../../resource/profilePlaceholder.jpg');
 
-const env = 'prod';
-// const env = 'dev';
+// const env = 'prod';
+const env = 'dev';
+
+const baseURL =
+  env === 'dev'
+    ? 'http://10.0.2.2:3000'
+    : 'https://ultimate-todo.herokuapp.com';
+
+const imageURL = 'img/user';
 
 export {
   delay,
@@ -47,5 +54,7 @@ export {
   logoStye,
   textColor,
   profilePlaceHolder,
-  env
+  env,
+  baseURL,
+  imageURL
 };
